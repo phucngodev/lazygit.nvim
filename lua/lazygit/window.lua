@@ -1,4 +1,47 @@
 local api = vim.api
+local backdropWin = -1
+local backdropBufnr = -1
+
+-- open backdrop window like modal
+function open_backdrop()
+  local backdropName = "Lazygit"
+  backdropBufnr = vim.api.nvim_create_buf(false, true)
+  backdropWin = vim.api.nvim_open_win(backdropBufnr, false, {
+    relative = "editor",
+    border = "none",
+    row = 0,
+    col = 0,
+    width = vim.o.columns,
+    height = vim.o.lines,
+    focusable = false,
+    style = "minimal",
+    zindex = 50,
+  })
+
+  local hl = vim.api.nvim_get_hl(0, { name = "Normal" })
+  local backdropBg = hl.bg
+  if vim.o.background == 'light' then
+    backdropBg = "Black"
+  end
+  vim.api.nvim_set_hl(0, backdropName, { bg = backdropBg, default = true })
+  vim.wo[backdropWin].winhighlight = "Normal:" .. backdropName
+  vim.wo[backdropWin].winblend = 50
+  vim.bo[backdropBufnr].buftype = "nofile"
+end
+
+-- close backdrop window
+function close_backdrop()
+  if vim.api.nvim_win_is_valid(backdropWin) then
+    vim.api.nvim_win_close(backdropWin, true)
+  end
+
+  if vim.api.nvim_buf_is_valid(backdropBufnr) then
+    vim.api.nvim_buf_delete(backdropBufnr, { force = true })
+  end
+
+  backdropWin = -1
+  backdropBufnr = -1
+end
 
 local function get_window_pos()
   local floating_window_scaling_factor = vim.g.lazygit_floating_window_scaling_factor
@@ -19,9 +62,9 @@ local function get_window_pos()
     return nil, nil, nil, nil, ret.win_id, ret.bufnr
   end
 
-  local height = math.ceil(vim.o.lines * floating_window_scaling_factor) - 1
-  local width = math.ceil(vim.o.columns * floating_window_scaling_factor)
-  local row = math.ceil(vim.o.lines - height) / 2
+  local height = math.ceil(vim.o.lines * 0.85) - 1
+  local width = math.ceil(vim.o.columns * 0.9)
+  local row = math.ceil(vim.o.lines - height) / 3
   local col = math.ceil(vim.o.columns - width) / 2
   return width, height, row, col
 end
@@ -66,6 +109,20 @@ local function open_floating_window()
   vim.api.nvim_create_autocmd('VimResized', {
     callback = function()
       vim.defer_fn(function()
+        if not vim.api.nvim_win_is_valid(backdropWin) then
+          return
+        end
+        api.nvim_win_set_config(backdropWin, {
+          relative = "editor",
+          row = 0,
+          col = 0,
+          width = vim.o.columns,
+          height = vim.o.lines,
+          focusable = false,
+          style = "minimal",
+          zindex = 50,
+        })
+
         if not vim.api.nvim_win_is_valid(win) then
           return
         end
@@ -89,4 +146,6 @@ end
 
 return {
   open_floating_window = open_floating_window,
+  open_backdrop = open_backdrop,
+  close_backdrop = close_backdrop,
 }
