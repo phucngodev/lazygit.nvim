@@ -1,4 +1,6 @@
 local open_floating_window = require("lazygit.window").open_floating_window
+local open_backdrop = require("lazygit.window").open_backdrop
+local close_backdrop = require("lazygit.window").close_backdrop
 local project_root_dir = require("lazygit.utils").project_root_dir
 local get_root = require("lazygit.utils").get_root
 local is_lazygit_available = require("lazygit.utils").is_lazygit_available
@@ -39,6 +41,8 @@ local function on_exit(job_id, code, event)
   if vim.g.lazygit_on_exit_callback ~= nil then
     vim.g.lazygit_on_exit_callback()
   end
+
+  close_backdrop()
 end
 
 --- Call lazygit
@@ -152,6 +156,8 @@ local function lazygit(path)
     print("Please install lazygit. Check documentation for more information")
     return
   end
+
+  open_backdrop()
 
   prev_win = vim.api.nvim_get_current_win()
 

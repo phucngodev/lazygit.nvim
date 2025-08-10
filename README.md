@@ -1,8 +1,11 @@
 # lazygit.nvim
 
+>[!NOTE]
+>forked [lazygit.nim](https://github.com/kdheepak/lazygit.nvim) and implement backdrop window when open lazygit window.
+
 Plugin for calling [lazygit](https://github.com/jesseduffield/lazygit) from within neovim.
 
-![](https://user-images.githubusercontent.com/1813121/87866391-79fcfe00-c93e-11ea-94a9-204947de1b39.gif)
+![](preview.png)
 
 See [akinsho/nvim-toggleterm](https://github.com/akinsho/nvim-toggleterm.lua#custom-terminals) or [voldikss/vim-floaterm](https://github.com/voldikss/vim-floaterm) as an alternative to this package.
 
