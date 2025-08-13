@@ -104,6 +104,20 @@ local function open_floating_window()
   vim.api.nvim_create_autocmd('VimResized', {
     callback = function()
       vim.defer_fn(function()
+        if not vim.api.nvim_win_is_valid(backdropWin) then
+          return
+        end
+        api.nvim_win_set_config(backdropWin, {
+          relative = "editor",
+          row = 0,
+          col = 0,
+          width = vim.o.columns,
+          height = vim.o.lines,
+          focusable = false,
+          style = "minimal",
+          zindex = 50,
+        })
+
         if not vim.api.nvim_win_is_valid(win) then
           return
         end
