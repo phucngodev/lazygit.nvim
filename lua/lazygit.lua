@@ -192,7 +192,12 @@ end
 
 --- :LazyGitCurrentFile entry point
 local function lazygitcurrentfile()
-  local current_dir = vim.fn.expand("%:p:h")
+  local current_dir
+  if vim.bo.buftype == "terminal" then
+    current_dir = vim.fn.getcwd()
+  else
+    current_dir = vim.fn.expand("%:p:h")
+  end
   local git_root = get_root(current_dir)
   lazygit(git_root)
 end
@@ -220,6 +225,10 @@ end
 
 --- :LazyGitFilterCurrentFile entry point
 local function lazygitfiltercurrentfile()
+  if vim.bo.buftype == "terminal" then
+    print("LazyGitFilterCurrentFile is not available from terminal buffers")
+    return
+  end
   local current_dir = vim.fn.expand("%:p:h")
   local git_root = get_root(current_dir)
   local file_path = vim.fn.expand("%:p")
