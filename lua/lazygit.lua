@@ -117,7 +117,7 @@ local function lazygitlog(path)
 
   win, buffer = open_floating_window()
 
-  local cmd = {"lazygit", "log"}
+  local cmd = { "lazygit", "log" }
 
   -- set path to the root path
   _ = project_root_dir()
@@ -163,7 +163,7 @@ local function lazygit(path)
 
   win, buffer = open_floating_window()
 
-  local cmd = {"lazygit"}
+  local cmd = { "lazygit" }
 
   -- set path to the root path
   _ = project_root_dir()
@@ -198,7 +198,12 @@ end
 
 --- :LazyGitCurrentFile entry point
 local function lazygitcurrentfile()
-  local current_dir = vim.fn.expand("%:p:h")
+  local current_dir
+  if vim.bo.buftype == "terminal" then
+    current_dir = vim.fn.getcwd()
+  else
+    current_dir = vim.fn.expand("%:p:h")
+  end
   local git_root = get_root(current_dir)
   lazygit(git_root)
 end
@@ -215,16 +220,21 @@ local function lazygitfilter(path, git_root)
   prev_win = vim.api.nvim_get_current_win()
   win, buffer = open_floating_window()
 
-  local cmd = {"lazygit", "-f", path}
-  if git_root then
+  local cmd = { "lazygit", "-f", path }
+  if git_root and (not vim.env.GIT_DIR and not vim.env.GIT_WORK_TREE) then
     table.insert(cmd, "-p")
     table.insert(cmd, git_root)
   end
+
   exec_lazygit_command(cmd)
 end
 
 --- :LazyGitFilterCurrentFile entry point
 local function lazygitfiltercurrentfile()
+  if vim.bo.buftype == "terminal" then
+    print("LazyGitFilterCurrentFile is not available from terminal buffers")
+    return
+  end
   local current_dir = vim.fn.expand("%:p:h")
   local git_root = get_root(current_dir)
   local file_path = vim.fn.expand("%:p")
